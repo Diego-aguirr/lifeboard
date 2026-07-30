@@ -25,26 +25,26 @@ Chain strategy: pending
 
 ## Phase 1: Infrastructure & Config
 
-- [ ] 1.1 Install `tailwindcss`, `@tailwindcss/vite`, `react-router` via pnpm
-- [ ] 1.2 Modify `vite.config.ts` — add `@tailwindcss/vite` plugin + `resolve.alias` for `@/`
-- [ ] 1.3 Modify `tsconfig.app.json` — add `baseUrl: "."` + `paths: {"@/*": ["src/*"]}`
-- [ ] 1.4 Modify `index.html` — add `class="dark"` to `<html>` tag
-- [ ] 1.5 Create `src/styles/globals.css` — Tailwind directives + `@theme inline` CSS vars + dark mode tokens
-- [ ] 1.6 Delete `src/index.css` and `src/App.css`
+- [x] 1.1 Install `tailwindcss`, `@tailwindcss/vite`, `react-router` via pnpm
+- [x] 1.2 Modify `vite.config.ts` — add `@tailwindcss/vite` plugin + `resolve.alias` for `@/`
+- [x] 1.3 Modify `tsconfig.app.json` — add `baseUrl: "."` + `paths: {"@/*": ["src/*"]}`
+- [x] 1.4 Modify `index.html` — add `class="dark"` to `<html>` tag
+- [x] 1.5 Create `src/styles/globals.css` — Tailwind directives + `@theme inline` CSS vars + dark mode tokens
+- [x] 1.6 Delete `src/index.css` and `src/App.css`
 
 ## Phase 2: Shared Atomic Components
 
-- [ ] 2.1 Create `src/shared/components/Button/Button.tsx` — Button with `variant` (primary/secondary/ghost/danger), `size` (sm/md/lg), children, disabled, onClick. Tailwind utility classes only.
-- [ ] 2.2 Create `src/shared/components/Input/Input.tsx` — Input with label, error state, standard input attrs. Error shows text + red border.
-- [ ] 2.3 Create `src/shared/components/Badge/Badge.tsx` — Badge with variant (default/success/warning/danger/info), inline pill.
-- [ ] 2.4 Create `src/shared/components/Skeleton/Skeleton.tsx` — Animated pulse placeholder, respects `prefers-reduced-motion`.
+- [x] 2.1 Create `src/shared/components/Button/Button.tsx` — Button with `variant` (primary/secondary/ghost/danger), `size` (sm/md/lg), children, disabled, onClick. Tailwind utility classes only.
+- [x] 2.2 Create `src/shared/components/Input/Input.tsx` — Input with label, error state, standard input attrs. Error shows text + red border.
+- [x] 2.3 Create `src/shared/components/Badge/Badge.tsx` — Badge with variant (default/success/warning/danger/info), inline pill.
+- [x] 2.4 Create `src/shared/components/Skeleton/Skeleton.tsx` — Animated pulse placeholder, respects `prefers-reduced-motion`.
 
 ## Phase 3: Tests — Shared Components
 
-- [ ] 3.1 Create `src/shared/components/Button/Button.test.tsx` — Test: renders variant colors, size dimensions, disabled state, onClick fires.
-- [ ] 3.2 Create `src/shared/components/Input/Input.test.tsx` — Test: error text visible, label click focuses input.
-- [ ] 3.3 Create `src/shared/components/Badge/Badge.test.tsx` — Test: variant renders correct color class.
-- [ ] 3.4 Create `src/shared/components/Skeleton/Skeleton.test.tsx` — Test: pulse animation present, respects reduced-motion.
+- [x] 3.1 Create `src/shared/components/Button/Button.test.tsx` — Test: renders variant colors, size dimensions, disabled state, onClick fires.
+- [x] 3.2 Create `src/shared/components/Input/Input.test.tsx` — Test: error text visible, label click focuses input.
+- [x] 3.3 Create `src/shared/components/Badge/Badge.test.tsx` — Test: variant renders correct color class.
+- [x] 3.4 Create `src/shared/components/Skeleton/Skeleton.test.tsx` — Test: pulse animation present, respects reduced-motion.
 
 ## Phase 4: Folder Structure & Entry Points
 
