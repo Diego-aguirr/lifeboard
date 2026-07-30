@@ -1,15 +1,19 @@
+import { useState } from 'react'
 import { Outlet } from 'react-router'
+import { Header } from './Header'
+import { Sidebar } from './Sidebar'
 
 export function MainLayout() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
   return (
     <div className="flex h-screen flex-col">
-      <header className="flex h-14 items-center border-b border-border px-4">
-        <h1 className="text-lg font-semibold text-foreground">LifeBoard</h1>
-      </header>
+      <Header />
       <div className="flex flex-1 overflow-hidden">
-        <aside className="w-60 border-r border-border p-4">
-          <p className="text-sm text-muted-foreground">Sidebar</p>
-        </aside>
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed((prev) => !prev)}
+        />
         <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>
