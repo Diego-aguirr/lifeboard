@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { motion } from 'motion/react'
 import type { Card } from '../types'
 
 interface CardItemProps {
@@ -54,7 +55,13 @@ export function CardItem({
   const hasTags = card.tags.length > 0
 
   return (
-    <div
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.15 }}
       className="group flex flex-col gap-1 p-2 rounded-md bg-surface border border-border hover:border-primary/30 transition-colors cursor-pointer"
       role="listitem"
       onClick={onOpenDetail}
@@ -171,6 +178,6 @@ export function CardItem({
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
