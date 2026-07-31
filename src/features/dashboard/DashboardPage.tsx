@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router'
-import { useBoards } from './hooks/useBoards'
+import { usePersistentBoards } from './hooks/usePersistentBoards'
 import { BoardCard } from './components/BoardCard'
 import { CreateBoardForm } from './components/CreateBoardForm'
 
 export default function DashboardPage() {
-  const { boards, createBoard, deleteBoard } = useBoards()
+  const { boards, createBoard, deleteBoard } = usePersistentBoards()
   const navigate = useNavigate()
 
   function handleCreate(title: string) {
