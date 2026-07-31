@@ -13,6 +13,7 @@ interface ColumnListProps {
   onAddCard: (columnId: string, title: string) => void
   onRenameCard: (columnId: string, cardId: string, title: string) => void
   onDeleteCard: (columnId: string, cardId: string) => void
+  onMoveCard: (cardId: string, direction: 'left' | 'right') => void
 }
 
 export function ColumnList({
@@ -24,6 +25,7 @@ export function ColumnList({
   onAddCard,
   onRenameCard,
   onDeleteCard,
+  onMoveCard,
 }: ColumnListProps) {
   const [isAdding, setIsAdding] = useState(false)
   const [newTitle, setNewTitle] = useState('')
@@ -43,6 +45,8 @@ export function ColumnList({
           key={col.id}
           title={col.title}
           cards={col.cards}
+          columnCount={columns.length}
+          columnIndex={index}
           isFirst={index === 0}
           isLast={index === columns.length - 1}
           onRename={title => onRenameColumn(col.id, title)}
@@ -51,6 +55,7 @@ export function ColumnList({
           onAddCard={title => onAddCard(col.id, title)}
           onRenameCard={(cardId, title) => onRenameCard(col.id, cardId, title)}
           onDeleteCard={cardId => onDeleteCard(col.id, cardId)}
+          onMoveCard={onMoveCard}
         />
       ))}
 

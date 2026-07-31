@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Button } from '@/shared/components/Button/Button'
+import { useState, useRef, useEffect } from 'react'
 
 interface ColumnHeaderProps {
   title: string
@@ -20,6 +19,14 @@ export function ColumnHeader({
 }: ColumnHeaderProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(title)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus()
+      inputRef.current?.select()
+    }
+  }, [isEditing])
 
   function handleSubmit() {
     const trimmed = draft.trim()
@@ -43,53 +50,55 @@ export function ColumnHeader({
     <div className="flex items-center justify-between gap-2 mb-3">
       {isEditing ? (
         <input
-          className="flex-1 text-sm font-medium bg-transparent border-b border-border outline-none text-foreground"
+          ref={inputRef}
+          className="flex-1 text-sm font-medium bg-transparent border-b border-primary outline-none text-foreground"
           value={draft}
           onChange={e => setDraft(e.target.value)}
           onBlur={handleSubmit}
           onKeyDown={handleKeyDown}
-          autoFocus
+          aria-label="Editar nombre de columna"
         />
       ) : (
         <h3
-          className="flex-1 text-sm font-medium text-foreground cursor-pointer hover:opacity-80"
+          className="flex-1 text-sm font-medium text-foreground cursor-pointer hover:text-primary truncate transition-colors"
           onDoubleClick={() => setIsEditing(true)}
+          title={title}
         >
           {title}
         </h3>
       )}
 
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
+      <div className="flex items-center gap-0.5">
+        <button
+          className="p-1 text-xs text-muted-foreground hover:text-foreground rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           onClick={() => onMove('left')}
           disabled={isFirst}
           aria-label="Mover columna a la izquierda"
+          title="Mover columna izquierda"
         >
           ←
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
+        </button>
+        <button
+          className="p-1 text-xs text-muted-foreground hover:text-foreground rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           onClick={() => onMove('right')}
           disabled={isLast}
           aria-label="Mover columna a la derecha"
+          title="Mover columna derecha"
         >
           →
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
+        </button>
+        <button
+          className="p-1 text-xs text-muted-foreground hover:text-danger rounded transition-colors"
           onClick={() => {
             if (window.confirm(`¿Eliminar columna "${title}"?`)) {
               onDelete()
             }
           }}
-          aria-label="Eliminar columna"
+          aria-label={`Eliminar columna ${title}`}
+          title="Eliminar columna"
         >
           ✕
-        </Button>
+        </button>
       </div>
     </div>
   )

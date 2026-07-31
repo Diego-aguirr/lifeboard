@@ -6,6 +6,8 @@ import { CreateCardForm } from './CreateCardForm'
 interface ColumnProps {
   title: string
   cards: Card[]
+  columnCount: number
+  columnIndex: number
   isFirst: boolean
   isLast: boolean
   onRename: (title: string) => void
@@ -14,11 +16,14 @@ interface ColumnProps {
   onAddCard: (title: string) => void
   onRenameCard: (cardId: string, title: string) => void
   onDeleteCard: (cardId: string) => void
+  onMoveCard: (cardId: string, direction: 'left' | 'right') => void
 }
 
 export function Column({
   title,
   cards,
+  columnCount,
+  columnIndex,
   isFirst,
   isLast,
   onRename,
@@ -27,6 +32,7 @@ export function Column({
   onAddCard,
   onRenameCard,
   onDeleteCard,
+  onMoveCard,
 }: ColumnProps) {
   return (
     <div className="flex flex-col w-72 shrink-0 rounded-lg bg-secondary/50 p-3">
@@ -44,8 +50,11 @@ export function Column({
           <CardItem
             key={card.id}
             title={card.title}
+            canMoveLeft={columnIndex > 0}
+            canMoveRight={columnIndex < columnCount - 1}
             onRename={title => onRenameCard(card.id, title)}
             onDelete={() => onDeleteCard(card.id)}
+            onMove={direction => onMoveCard(card.id, direction)}
           />
         ))}
       </div>
