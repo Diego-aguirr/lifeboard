@@ -46,6 +46,7 @@ export default function BoardPage() {
     renameCard,
     deleteCard,
     moveCard,
+    updateCard,
   } = useBoard(boardFromStorage)
 
   return (
@@ -62,6 +63,7 @@ export default function BoardPage() {
         onRenameCard={renameCard}
         onDeleteCard={deleteCard}
         onMoveCard={moveCard}
+        onUpdateCard={updateCard}
       />
     </div>
   )

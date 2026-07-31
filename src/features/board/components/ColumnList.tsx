@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Column as ColumnType } from '../types'
+import type { Card } from '../types'
 import { Column } from './Column'
 import { Button } from '@/shared/components/Button/Button'
 import { Input } from '@/shared/components/Input/Input'
@@ -14,6 +15,7 @@ interface ColumnListProps {
   onRenameCard: (columnId: string, cardId: string, title: string) => void
   onDeleteCard: (columnId: string, cardId: string) => void
   onMoveCard: (cardId: string, direction: 'left' | 'right') => void
+  onUpdateCard: (cardId: string, updates: Partial<Card>) => void
 }
 
 export function ColumnList({
@@ -26,6 +28,7 @@ export function ColumnList({
   onRenameCard,
   onDeleteCard,
   onMoveCard,
+  onUpdateCard,
 }: ColumnListProps) {
   const [isAdding, setIsAdding] = useState(false)
   const [newTitle, setNewTitle] = useState('')
@@ -56,6 +59,7 @@ export function ColumnList({
           onRenameCard={(cardId, title) => onRenameCard(col.id, cardId, title)}
           onDeleteCard={cardId => onDeleteCard(col.id, cardId)}
           onMoveCard={onMoveCard}
+          onUpdateCard={onUpdateCard}
         />
       ))}
 
