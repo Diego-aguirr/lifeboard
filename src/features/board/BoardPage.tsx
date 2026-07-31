@@ -6,7 +6,7 @@ import { ColumnList } from './components/ColumnList'
 
 export default function BoardPage() {
   const { boardId } = useParams<{ boardId: string }>()
-  const { getBoardById, updateCard, loading } = useBoardContext()
+  const { getBoardById, loading } = useBoardContext()
   const boardFromStorage = boardId ? getBoardById(boardId) : undefined
 
   if (loading) {
@@ -50,6 +50,7 @@ export default function BoardPage() {
       <BoardHeader icon={board.icon} title={board.title} color={board.color} />
 
       <ColumnList
+        boardId={board.id}
         columns={columns}
         onAddColumn={addColumn}
         onRenameColumn={renameColumn}
