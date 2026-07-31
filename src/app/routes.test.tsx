@@ -11,7 +11,7 @@ function renderRoute(path: string) {
 describe('Router', () => {
   it('renders Dashboard at root path /', () => {
     renderRoute('/')
-    expect(screen.getByText('Mis Tableros')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Mis Tableros' })).toBeInTheDocument()
   })
 
   it('shows not found for nonexistent board', () => {
@@ -21,6 +21,6 @@ describe('Router', () => {
 
   it('redirects unknown routes to Dashboard', () => {
     renderRoute('/nonexistent')
-    expect(screen.getByText('Mis Tableros')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Mis Tableros' })).toBeInTheDocument()
   })
 })

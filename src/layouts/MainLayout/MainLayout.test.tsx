@@ -21,12 +21,12 @@ function renderLayout(path = '/') {
 describe('MainLayout', () => {
   it('renders the app title in the header', () => {
     renderLayout()
-    expect(screen.getByRole('heading', { name: 'LifeBoard' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'LifeBoard' })).toBeInTheDocument()
   })
 
   it('renders the sidebar with toggle button', () => {
     renderLayout()
-    expect(screen.getByRole('button', { name: /toggle sidebar/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /colapsar sidebar/i })).toBeInTheDocument()
   })
 
   it('renders child routes in the main content area', () => {
@@ -37,18 +37,18 @@ describe('MainLayout', () => {
   it('collapses sidebar when toggle is clicked', async () => {
     const user = userEvent.setup()
     renderLayout()
-    const toggle = screen.getByRole('button', { name: /toggle sidebar/i })
+    const toggle = screen.getByRole('button', { name: /colapsar sidebar/i })
     await user.click(toggle)
-    expect(screen.queryByText('Sidebar')).not.toBeInTheDocument()
+    expect(screen.queryByText('Mis Tableros')).not.toBeInTheDocument()
   })
 
   it('expands sidebar after collapsing', async () => {
     const user = userEvent.setup()
     renderLayout()
-    const toggle = screen.getByRole('button', { name: /toggle sidebar/i })
+    const toggle = screen.getByRole('button', { name: /colapsar sidebar/i })
     await user.click(toggle)
-    expect(screen.queryByText('Sidebar')).not.toBeInTheDocument()
-    await user.click(toggle)
-    expect(screen.getByText('Sidebar')).toBeInTheDocument()
+    expect(screen.queryByText('Mis Tableros')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /expandir sidebar/i }))
+    expect(screen.getByText('Mis Tableros')).toBeInTheDocument()
   })
 })
