@@ -1,90 +1,40 @@
-import { useParams } from 'react-router'
+import { useParams, Link } from 'react-router'
+import { storage } from '@/shared/storage/StorageService'
+import { boardsSchema } from '@/shared/validations/board.schema'
 import { useBoard } from './hooks/useBoard'
 import { BoardHeader } from './components/BoardHeader'
 import { ColumnList } from './components/ColumnList'
+import type { Board } from './types'
 
-// Tablero de ejemplo para ver la UI funcionando
-const DEMO_BOARD = {
-  id: 'demo-1',
-  title: 'Aprender React',
-  icon: '⚛️',
-  color: '#61dafb',
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  columns: [
-    {
-      id: 'col-1',
-      title: 'Por aprender',
-      order: 0,
-      cards: [
-        {
-          id: 'card-1',
-          title: 'Components y Props',
-          description: '',
-          priority: 'high' as const,
-          tags: [],
-          checklist: [],
-          progress: 0,
-          timeSpent: 0,
-          startDate: null,
-          targetDate: null,
-          difficulty: 'easy' as const,
-          order: 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: 'card-2',
-          title: 'useState y useEffect',
-          description: '',
-          priority: 'high' as const,
-          tags: [],
-          checklist: [],
-          progress: 0,
-          timeSpent: 0,
-          startDate: null,
-          targetDate: null,
-          difficulty: 'medium' as const,
-          order: 1,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ],
-    },
-    {
-      id: 'col-2',
-      title: 'Estudiando',
-      order: 1,
-      cards: [
-        {
-          id: 'card-3',
-          title: 'Custom Hooks',
-          description: '',
-          priority: 'medium' as const,
-          tags: [],
-          checklist: [],
-          progress: 30,
-          timeSpent: 45,
-          startDate: new Date().toISOString(),
-          targetDate: null,
-          difficulty: 'medium' as const,
-          order: 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ],
-    },
-    {
-      id: 'col-3',
-      title: 'Dominado',
-      order: 2,
-      cards: [],
-    },
-  ],
+function loadBoardFromStorage(boardId: string): Board | null {
+  const raw = storage.get<unknown>('boards')
+  if (raw === null) return null
+
+  const result = boardsSchema.safeParse(raw)
+  if (!result.success) return null
+
+  const boards = result.data as Board[]
+  return boards.find(b => b.id === boardId) ?? null
 }
 
 export default function BoardPage() {
-  const { boardId: _boardId } = useParams<{ boardId: string }>()
+  const { boardId } = useParams<{ boardId: string }>()
+  const boardFromStorage = boardId ? loadBoardFromStorage(boardId) : null
+
+  if (!boardFromStorage) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-4">
+        <p className="text-muted-foreground">Tablero no encontrado</p>
+        <Link
+          to="/"
+          className="text-primary hover:underline"
+        >
+          Volver al Dashboard
+        </Link>
+      </div>
+    )
+  }
+
   const {
     board,
     columns,
@@ -95,7 +45,7 @@ export default function BoardPage() {
     addCard,
     renameCard,
     deleteCard,
-  } = useBoard(DEMO_BOARD)
+  } = useBoard(boardFromStorage)
 
   return (
     <div className="flex flex-col h-full">

@@ -14,9 +14,9 @@ describe('Router', () => {
     expect(screen.getByText('Mis Tableros')).toBeInTheDocument()
   })
 
-  it('renders Board at /board/:boardId', () => {
+  it('shows not found for nonexistent board', () => {
     renderRoute('/board/abc123')
-    expect(screen.getByText('Aprender React')).toBeInTheDocument()
+    expect(screen.getByText('Tablero no encontrado')).toBeInTheDocument()
   })
 
   it('redirects unknown routes to Dashboard', () => {
