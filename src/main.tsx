@@ -3,11 +3,14 @@ import { createRoot } from 'react-dom/client'
 import '@/styles/globals.css'
 import App from '@/app/App'
 import { ThemeProvider } from '@/lib/theme-provider'
+import { BoardProvider } from '@/features/board/context/BoardContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider defaultTheme="dark">
-      <App />
+      <BoardProvider>
+        <App />
+      </BoardProvider>
     </ThemeProvider>
   </StrictMode>,
 )

@@ -2,10 +2,15 @@ import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { routes } from './routes'
+import { BoardProvider } from '@/features/board/context/BoardContext'
 
 function renderRoute(path: string) {
   const router = createMemoryRouter(routes, { initialEntries: [path] })
-  return render(<RouterProvider router={router} />)
+  return render(
+    <BoardProvider>
+      <RouterProvider router={router} />
+    </BoardProvider>
+  )
 }
 
 describe('Router', () => {
