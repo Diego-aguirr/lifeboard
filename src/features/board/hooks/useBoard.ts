@@ -38,6 +38,27 @@ export function useBoard(initialBoard: Board) {
     }))
   }
 
+  function moveColumn(id: string, direction: 'left' | 'right') {
+    const sorted = [...board.columns].sort((a, b) => a.order - b.order)
+    const index = sorted.findIndex(col => col.id === id)
+    const targetIndex = direction === 'right' ? index + 1 : index - 1
+
+    if (targetIndex < 0 || targetIndex >= sorted.length) return
+
+    const sourceOrder = sorted[index].order
+    const targetOrder = sorted[targetIndex].order
+
+    setBoard(prev => ({
+      ...prev,
+      columns: prev.columns.map(col => {
+        if (col.id === sorted[index].id) return { ...col, order: targetOrder }
+        if (col.id === sorted[targetIndex].id) return { ...col, order: sourceOrder }
+        return col
+      }),
+      updatedAt: new Date().toISOString(),
+    }))
+  }
+
   // ─── Card CRUD ──────────────────────────────────────
 
   function addCard(columnId: string, title: string) {
@@ -138,6 +159,7 @@ export function useBoard(initialBoard: Board) {
     addColumn,
     renameColumn,
     deleteColumn,
+    moveColumn,
     addCard,
     renameCard,
     deleteCard,
