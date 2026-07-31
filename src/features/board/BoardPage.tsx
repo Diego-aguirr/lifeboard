@@ -1,13 +1,23 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router'
 import { useBoardContext } from './context/BoardContext'
 import { useBoard } from './hooks/useBoard'
 import { BoardHeader } from './components/BoardHeader'
 import { ColumnList } from './components/ColumnList'
+import { CommandPalette } from '@/shared/components/CommandPalette/CommandPalette'
+import { useKeyboardShortcuts } from '@/shared/hooks/useKeyboardShortcuts'
 
 export default function BoardPage() {
   const { boardId } = useParams<{ boardId: string }>()
   const { getBoardById, loading } = useBoardContext()
   const boardFromStorage = boardId ? getBoardById(boardId) : undefined
+  const [showCommandPalette, setShowCommandPalette] = useState(false)
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    onCommandPalette: () => setShowCommandPalette(true),
+    onEscape: () => setShowCommandPalette(false),
+  })
 
   if (loading) {
     return (
@@ -61,6 +71,11 @@ export default function BoardPage() {
         onDeleteCard={deleteCard}
         onMoveCard={moveCard}
         onUpdateCard={(cardId, updates) => updateCard(board.id, cardId, updates)}
+      />
+
+      <CommandPalette
+        isOpen={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
       />
     </div>
   )
