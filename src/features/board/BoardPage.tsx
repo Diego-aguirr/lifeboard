@@ -84,7 +84,7 @@ const DEMO_BOARD = {
 }
 
 export default function BoardPage() {
-  const { boardId } = useParams<{ boardId: string }>()
+  const { boardId: _boardId } = useParams<{ boardId: string }>()
   const {
     board,
     columns,

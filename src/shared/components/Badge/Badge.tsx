@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 
 type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info'
 
@@ -11,13 +12,13 @@ const variantStyles: Record<BadgeVariant, string> = {
   default: 'bg-muted text-muted-foreground',
   success: 'bg-success text-white',
   warning: 'bg-warning text-white',
-  danger: 'bg-danger text-danger-foreground',
+  danger: 'bg-danger text-white',
   info: 'bg-info text-white',
 }
 
 export function Badge({ variant = 'default', children }: BadgeProps) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${variantStyles[variant]}`}>
+    <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium', variantStyles[variant])}>
       {children}
     </span>
   )

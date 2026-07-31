@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Column as ColumnType, Card } from '../types'
+import type { Column as ColumnType } from '../types'
 import { Column } from './Column'
 import { Button } from '@/shared/components/Button/Button'
 import { Input } from '@/shared/components/Input/Input'

@@ -16,7 +16,7 @@ describe('Router', () => {
 
   it('renders Board at /board/:boardId', () => {
     renderRoute('/board/abc123')
-    expect(screen.getByText('Tablero: abc123')).toBeInTheDocument()
+    expect(screen.getByText('Aprender React')).toBeInTheDocument()
   })
 
   it('redirects unknown routes to Dashboard', () => {

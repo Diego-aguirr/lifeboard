@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
 type ButtonSize = 'sm' | 'md' | 'lg'
@@ -13,7 +14,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary: 'bg-primary text-primary-foreground hover:opacity-90',
   secondary: 'bg-secondary text-secondary-foreground hover:opacity-90',
   ghost: 'bg-transparent hover:bg-surface-hover text-foreground',
-  danger: 'bg-danger text-danger-foreground hover:opacity-90',
+  danger: 'bg-danger text-white hover:opacity-90',
 }
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -27,12 +28,18 @@ export function Button({
   size = 'md',
   children,
   disabled,
-  className = '',
+  className,
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center rounded-md font-medium transition-opacity ${variantStyles[variant]} ${sizeStyles[size]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
+      className={cn(
+        'inline-flex items-center justify-center rounded-md font-medium transition-opacity',
+        variantStyles[variant],
+        sizeStyles[size],
+        disabled && 'opacity-50 cursor-not-allowed',
+        className
+      )}
       disabled={disabled}
       {...props}
     >
