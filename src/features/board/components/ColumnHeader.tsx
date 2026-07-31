@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, type HTMLAttributes } from 'react'
 
 interface ColumnHeaderProps {
   title: string
@@ -7,6 +7,7 @@ interface ColumnHeaderProps {
   onRename: (title: string) => void
   onDelete: () => void
   onMove: (direction: 'left' | 'right') => void
+  dragHandleProps?: HTMLAttributes<HTMLDivElement>
 }
 
 export function ColumnHeader({
@@ -16,6 +17,7 @@ export function ColumnHeader({
   onRename,
   onDelete,
   onMove,
+  dragHandleProps,
 }: ColumnHeaderProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(title)
@@ -60,9 +62,10 @@ export function ColumnHeader({
         />
       ) : (
         <h3
-          className="flex-1 text-sm font-medium text-foreground cursor-pointer hover:text-primary truncate transition-colors"
+          className="flex-1 text-sm font-medium text-foreground cursor-grab active:cursor-grabbing hover:text-primary truncate transition-colors"
           onDoubleClick={() => setIsEditing(true)}
           title={title}
+          {...dragHandleProps}
         >
           {title}
         </h3>
