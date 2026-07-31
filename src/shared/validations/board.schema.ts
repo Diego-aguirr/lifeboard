@@ -17,6 +17,7 @@ export const cardSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string(),
+  notes: z.string().optional().default(''),
   priority: prioritySchema,
   tags: z.array(z.string()),
   checklist: z.array(checklistItemSchema),

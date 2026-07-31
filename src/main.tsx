@@ -7,10 +7,10 @@ import { BoardProvider } from '@/features/board/context/BoardContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider defaultTheme="dark">
-      <BoardProvider>
-        <App />
-      </BoardProvider>
-    </ThemeProvider>
-  </StrictMode>,
+      <ThemeProvider defaultTheme="system">
+        <BoardProvider>
+          <App />
+        </BoardProvider>
+      </ThemeProvider>
+    </StrictMode>,
 )

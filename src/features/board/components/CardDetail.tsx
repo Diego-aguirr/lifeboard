@@ -1,9 +1,31 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Modal, ModalHeader, ModalBody, ModalFooter } from '@/shared/components/Modal/Modal'
 import type { Card, ChecklistItem } from '../types'
+
+// Simple markdown parser (bold, italic, code, links, lists, headers)
+function parseMarkdown(text: string): string {
+  if (!text) return ''
+  return text
+    // Headers
+    .replace(/^### (.+)$/gm, '<h3 class="text-sm font-bold text-foreground mt-3 mb-1">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 class="text-base font-bold text-foreground mt-4 mb-2">$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1 class="text-lg font-bold text-foreground mt-4 mb-2">$1</h1>')
+    // Bold and italic
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong class="font-bold">$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-bold">$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em class="italic">$1</em>')
+    // Inline code
+    .replace(/`(.+?)`/g, '<code class="px-1.5 py-0.5 bg-muted text-foreground rounded text-xs font-mono">$1</code>')
+    // Links
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">$1</a>')
+    // Unordered lists
+    .replace(/^- (.+)$/gm, '<li class="ml-4 text-sm text-foreground">• $1</li>')
+    // Line breaks
+    .replace(/\n\n/g, '<br /><br />')
+}
 
 const cardFormSchema = z.object({
   title: z.string().min(1, 'El título es requerido'),
@@ -26,6 +48,10 @@ export function CardDetail({ card, isOpen, onClose, onSave }: CardDetailProps) {
   const [tags, setTags] = useState<string[]>(card.tags)
   const [newTag, setNewTag] = useState('')
   const [newChecklistItem, setNewChecklistItem] = useState('')
+  const [notes, setNotes] = useState(card.notes || '')
+  const [showNotesPreview, setShowNotesPreview] = useState(false)
+
+  const renderedNotes = useMemo(() => parseMarkdown(notes), [notes])
 
   const { register, handleSubmit, formState: { errors } } = useForm<CardFormData>({
     resolver: zodResolver(cardFormSchema),
@@ -42,6 +68,7 @@ export function CardDetail({ card, isOpen, onClose, onSave }: CardDetailProps) {
       ...data,
       checklist,
       tags,
+      notes,
       updatedAt: new Date().toISOString(),
     })
     onClose()
@@ -268,6 +295,35 @@ export function CardDetail({ card, isOpen, onClose, onSave }: CardDetailProps) {
                 +
               </button>
             </div>
+          </div>
+
+          {/* Notes (Markdown) */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-foreground">Notas</h3>
+              <button
+                type="button"
+                onClick={() => setShowNotesPreview(!showNotesPreview)}
+                className="text-xs text-primary hover:text-primary/80 transition-colors"
+              >
+                {showNotesPreview ? '✏️ Editar' : '👁 Vista previa'}
+              </button>
+            </div>
+            {showNotesPreview ? (
+              <div
+                className="w-full min-h-[120px] px-3 py-2 text-sm bg-surface border border-border rounded-md prose prose-sm dark:prose-invert max-w-none"
+                dangerouslySetInnerHTML={{ __html: renderedNotes || '<span class="text-muted-foreground">Sin contenido</span>' }}
+              />
+            ) : (
+              <textarea
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                rows={5}
+                placeholder="Escribe notas en Markdown...&#10;&#10;**Negrita** *cursiva* `código`&#10;- Lista&#10;## Títulos"
+                className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors resize-none font-mono"
+                aria-label="Notas en Markdown"
+              />
+            )}
           </div>
         </ModalBody>
 
