@@ -12,6 +12,40 @@ interface PomodoroState {
 const WORK_DURATION = 25 * 60 // 25 minutes
 const BREAK_DURATION = 5 * 60 // 5 minutes
 
+// Generate a pleasant notification sound using Web Audio API
+function playNotificationSound() {
+  try {
+    const ctx = new AudioContext()
+
+    // Three ascending tones
+    const frequencies = [523.25, 659.25, 783.99] // C5, E5, G5
+    const now = ctx.currentTime
+
+    frequencies.forEach((freq, i) => {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(freq, now)
+
+      gain.gain.setValueAtTime(0, now + i * 0.15)
+      gain.gain.linearRampToValueAtTime(0.3, now + i * 0.15 + 0.05)
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.4)
+
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+
+      osc.start(now + i * 0.15)
+      osc.stop(now + i * 0.15 + 0.5)
+    })
+
+    // Close context after sounds finish
+    setTimeout(() => ctx.close(), 2000)
+  } catch {
+    // Audio not available, fail silently
+  }
+}
+
 export function usePomodoro() {
   const [state, setState] = useState<PomodoroState>({
     mode: 'work',
@@ -54,8 +88,9 @@ export function usePomodoro() {
     intervalRef.current = setInterval(() => {
       setState(prev => {
         if (prev.timeLeft <= 1) {
-          // Timer finished
+          // Timer finished — play sound
           clearTimer()
+          playNotificationSound()
           const newMode = prev.mode === 'work' ? 'break' : 'work'
           return {
             ...prev,
