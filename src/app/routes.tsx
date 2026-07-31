@@ -3,6 +3,7 @@ import { Navigate } from 'react-router'
 import { MainLayout } from '@/layouts/MainLayout/MainLayout'
 import DashboardPage from '@/features/dashboard/DashboardPage'
 import BoardPage from '@/features/board/BoardPage'
+import { StatsPage } from '@/features/stats/StatsPage'
 
 export const routes: RouteObject[] = [
   {
@@ -11,6 +12,7 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <DashboardPage /> },
       { path: 'board/:boardId', element: <BoardPage /> },
+      { path: 'stats', element: <StatsPage /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },

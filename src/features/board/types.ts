@@ -8,6 +8,7 @@ export interface Card {
   id: string
   title: string
   description: string
+  notes: string
   priority: Priority
   tags: string[]
   checklist: ChecklistItem[]

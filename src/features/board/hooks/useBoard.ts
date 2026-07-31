@@ -67,6 +67,7 @@ export function useBoard(initialBoard: Board) {
       id: generateId(),
       title,
       description: '',
+      notes: '',
       priority: 'low',
       tags: [],
       checklist: [],
