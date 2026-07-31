@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import type { Card } from '../types'
 import { ColumnHeader } from './ColumnHeader'
 import { CardItem } from './CardItem'
+import { CardDetail } from './CardDetail'
 import { CreateCardForm } from './CreateCardForm'
 
 interface ColumnProps {
@@ -17,6 +19,7 @@ interface ColumnProps {
   onRenameCard: (cardId: string, title: string) => void
   onDeleteCard: (cardId: string) => void
   onMoveCard: (cardId: string, direction: 'left' | 'right') => void
+  onUpdateCard: (cardId: string, updates: Partial<Card>) => void
 }
 
 export function Column({
@@ -33,7 +36,10 @@ export function Column({
   onRenameCard,
   onDeleteCard,
   onMoveCard,
+  onUpdateCard,
 }: ColumnProps) {
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null)
+
   return (
     <div className="flex flex-col w-72 shrink-0 rounded-lg bg-secondary/50 p-3">
       <ColumnHeader
@@ -49,17 +55,30 @@ export function Column({
         {cards.map(card => (
           <CardItem
             key={card.id}
-            title={card.title}
+            card={card}
             canMoveLeft={columnIndex > 0}
             canMoveRight={columnIndex < columnCount - 1}
             onRename={title => onRenameCard(card.id, title)}
             onDelete={() => onDeleteCard(card.id)}
             onMove={direction => onMoveCard(card.id, direction)}
+            onOpenDetail={() => setSelectedCard(card)}
           />
         ))}
       </div>
 
       <CreateCardForm onCreate={onAddCard} />
+
+      {selectedCard && (
+        <CardDetail
+          card={selectedCard}
+          isOpen={true}
+          onClose={() => setSelectedCard(null)}
+          onSave={updates => {
+            onUpdateCard(selectedCard.id, updates)
+            setSelectedCard(null)
+          }}
+        />
+      )}
     </div>
   )
 }

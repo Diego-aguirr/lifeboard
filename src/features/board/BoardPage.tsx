@@ -42,6 +42,7 @@ export default function BoardPage() {
     renameCard,
     deleteCard,
     moveCard,
+    updateCard,
   } = useBoard(boardFromStorage)
 
   return (

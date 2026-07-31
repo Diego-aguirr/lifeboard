@@ -149,6 +149,20 @@ export function useBoard(initialBoard: Board) {
     }))
   }
 
+  function updateCard(cardId: string, updates: Partial<Card>) {
+    const now = new Date().toISOString()
+    setBoard(prev => ({
+      ...prev,
+      columns: prev.columns.map(col => ({
+        ...col,
+        cards: col.cards.map(card =>
+          card.id === cardId ? { ...card, ...updates, updatedAt: now } : card
+        ),
+      })),
+      updatedAt: now,
+    }))
+  }
+
   // ─── Derived state ──────────────────────────────────
 
   const columns = [...board.columns].sort((a, b) => a.order - b.order)
@@ -164,5 +178,6 @@ export function useBoard(initialBoard: Board) {
     renameCard,
     deleteCard,
     moveCard,
+    updateCard,
   }
 }
