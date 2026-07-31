@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'motion/react'
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog/ConfirmDialog'
 import type { Card } from '../types'
 
 interface CardItemProps {
@@ -23,6 +24,7 @@ export function CardItem({
 }: CardItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(card.title)
+  const [showConfirm, setShowConfirm] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -55,129 +57,143 @@ export function CardItem({
   const hasTags = card.tags.length > 0
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 5 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.15 }}
-      className="group flex flex-col gap-1 p-2 rounded-md bg-surface border border-border hover:border-primary/30 transition-colors cursor-pointer"
-      role="listitem"
-      onClick={onOpenDetail}
-      onKeyDown={e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onOpenDetail()
-        }
-      }}
-      tabIndex={0}
-      aria-label={`Tarjeta: ${card.title}`}
-    >
-      {/* Title */}
-      {isEditing ? (
-        <input
-          ref={inputRef}
-          className="flex-1 text-sm bg-transparent outline-none text-foreground min-w-0"
-          value={draft}
-          onChange={e => setDraft(e.target.value)}
-          onBlur={handleSubmit}
-          onKeyDown={handleKeyDown}
-          onClick={e => e.stopPropagation()}
-          aria-label="Editar nombre de tarjeta"
-        />
-      ) : (
-        <span
-          className="flex-1 text-sm text-foreground truncate"
-          onDoubleClick={e => {
-            e.stopPropagation()
-            setIsEditing(true)
-          }}
-        >
-          {card.title}
-        </span>
-      )}
-
-      {/* Tags */}
-      {hasTags && (
-        <div className="flex flex-wrap gap-1">
-          {card.tags.slice(0, 3).map(tag => (
-            <span
-              key={tag}
-              className="px-1.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary rounded"
-            >
-              {tag}
-            </span>
-          ))}
-          {card.tags.length > 3 && (
-            <span className="text-[10px] text-muted-foreground">
-              +{card.tags.length - 3}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Bottom row: progress + actions */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {/* Priority indicator */}
-          <span
-            className={`w-2 h-2 rounded-full ${
-              card.priority === 'high' ? 'bg-danger' :
-              card.priority === 'medium' ? 'bg-warning' :
-              'bg-success'
-            }`}
-            title={`Prioridad: ${card.priority}`}
+    <>
+      <motion.div
+        layout
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        whileHover={{ scale: 1.02 }}
+        transition={{ duration: 0.15 }}
+        className="group flex flex-col gap-1 p-2 rounded-md bg-surface border border-border hover:border-primary/30 transition-colors cursor-pointer"
+        role="listitem"
+        onClick={onOpenDetail}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onOpenDetail()
+          }
+        }}
+        tabIndex={0}
+        aria-label={`Tarjeta: ${card.title}`}
+      >
+        {/* Title */}
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            className="flex-1 text-sm bg-transparent outline-none text-foreground min-w-0"
+            value={draft}
+            onChange={e => setDraft(e.target.value)}
+            onBlur={handleSubmit}
+            onKeyDown={handleKeyDown}
+            onClick={e => e.stopPropagation()}
+            aria-label="Editar nombre de tarjeta"
           />
+        ) : (
+          <span
+            className="flex-1 text-sm text-foreground truncate"
+            onDoubleClick={e => {
+              e.stopPropagation()
+              setIsEditing(true)
+            }}
+          >
+            {card.title}
+          </span>
+        )}
 
-          {/* Checklist progress */}
-          {hasChecklist && (
-            <span className="text-[10px] text-muted-foreground" title={`${completedCount}/${card.checklist.length} completados`}>
-              ✓ {completedCount}/{card.checklist.length}
-            </span>
-          )}
-        </div>
+        {/* Tags */}
+        {hasTags && (
+          <div className="flex flex-wrap gap-1">
+            {card.tags.slice(0, 3).map(tag => (
+              <span
+                key={tag}
+                className="px-1.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary rounded"
+              >
+                {tag}
+              </span>
+            ))}
+            {card.tags.length > 3 && (
+              <span className="text-[10px] text-muted-foreground">
+                +{card.tags.length - 3}
+              </span>
+            )}
+          </div>
+        )}
 
-        {/* Actions */}
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            className="p-1 text-xs text-muted-foreground hover:text-foreground rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            onClick={e => {
-              e.stopPropagation()
-              onMove('left')
-            }}
-            disabled={!canMoveLeft}
-            aria-label="Mover tarjeta a la izquierda"
-            title="Mover a columna anterior"
-          >
-            ◀
-          </button>
-          <button
-            className="p-1 text-xs text-muted-foreground hover:text-foreground rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            onClick={e => {
-              e.stopPropagation()
-              onMove('right')
-            }}
-            disabled={!canMoveRight}
-            aria-label="Mover tarjeta a la derecha"
-            title="Mover a columna siguiente"
-          >
-            ▶
-          </button>
-          <button
-            className="p-1 text-xs text-muted-foreground hover:text-danger rounded transition-colors"
-            onClick={e => {
-              e.stopPropagation()
-              if (window.confirm(`¿Eliminar tarjeta "${card.title}"?`)) {
-                onDelete()
-              }
-            }}
-            aria-label={`Eliminar tarjeta ${card.title}`}
-          >
-            ✕
-          </button>
+        {/* Bottom row: progress + actions */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {/* Priority indicator */}
+            <span
+              className={`w-2 h-2 rounded-full ${
+                card.priority === 'high' ? 'bg-danger' :
+                card.priority === 'medium' ? 'bg-warning' :
+                'bg-success'
+              }`}
+              title={`Prioridad: ${card.priority}`}
+            />
+
+            {/* Checklist progress */}
+            {hasChecklist && (
+              <span className="text-[10px] text-muted-foreground" title={`${completedCount}/${card.checklist.length} completados`}>
+                ✓ {completedCount}/{card.checklist.length}
+              </span>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              className="p-1 text-xs text-muted-foreground hover:text-foreground rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              onClick={e => {
+                e.stopPropagation()
+                onMove('left')
+              }}
+              disabled={!canMoveLeft}
+              aria-label="Mover tarjeta a la izquierda"
+              title="Mover a columna anterior"
+            >
+              ◀
+            </button>
+            <button
+              className="p-1 text-xs text-muted-foreground hover:text-foreground rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              onClick={e => {
+                e.stopPropagation()
+                onMove('right')
+              }}
+              disabled={!canMoveRight}
+              aria-label="Mover tarjeta a la derecha"
+              title="Mover a columna siguiente"
+            >
+              ▶
+            </button>
+            <button
+              className="p-1 text-xs text-muted-foreground hover:text-danger rounded transition-colors"
+              onClick={e => {
+                e.stopPropagation()
+                setShowConfirm(true)
+              }}
+              aria-label={`Eliminar tarjeta ${card.title}`}
+            >
+              ✕
+            </button>
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+
+      <ConfirmDialog
+        isOpen={showConfirm}
+        title="Eliminar tarjeta"
+        message={`¿Estás seguro que querés eliminar "${card.title}"? Esta acción no se puede deshacer.`}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={() => {
+          setShowConfirm(false)
+          onDelete()
+        }}
+        onCancel={() => setShowConfirm(false)}
+      />
+    </>
   )
 }

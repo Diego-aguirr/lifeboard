@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router'
 import { useBoardContext } from '@/features/board/context/BoardContext'
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog/ConfirmDialog'
 import { BoardCard } from './components/BoardCard'
 import { CreateBoardForm } from './components/CreateBoardForm'
 
@@ -8,6 +9,7 @@ export default function DashboardPage() {
   const { boards, createBoard, deleteBoard, loading } = useBoardContext()
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null)
 
   const filteredBoards = useMemo(() => {
     if (!search.trim()) return boards
@@ -21,11 +23,16 @@ export default function DashboardPage() {
     createBoard({ title, icon: '📋', color: '#3b82f6' })
   }
 
-  function handleDelete(id: string) {
-    if (window.confirm('¿Eliminar este tablero?')) {
-      deleteBoard(id)
-    }
+  function handleDeleteClick(id: string, title: string) {
+    setDeleteTarget({ id, title })
   }
+
+  const confirmDelete = useCallback(() => {
+    if (deleteTarget) {
+      deleteBoard(deleteTarget.id)
+      setDeleteTarget(null)
+    }
+  }, [deleteTarget, deleteBoard])
 
   if (loading) {
     return (
@@ -85,11 +92,22 @@ export default function DashboardPage() {
               key={board.id}
               board={board}
               onClick={() => navigate(`/board/${board.id}`)}
-              onDelete={handleDelete}
+              onDelete={() => handleDeleteClick(board.id, board.title)}
             />
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        title="Eliminar tablero"
+        message={`¿Estás seguro que querés eliminar "${deleteTarget?.title}"? Esta acción no se puede deshacer.`}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }
