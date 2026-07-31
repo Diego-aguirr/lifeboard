@@ -67,12 +67,14 @@ describe('BoardContext', () => {
       vi.advanceTimersByTime(100)
     })
 
+    const initialLength = result.current.boards.length
+
     act(() => {
       result.current.createBoard({ title: 'New Board', icon: '📋', color: '#3b82f6' })
     })
 
-    expect(result.current.boards).toHaveLength(1)
-    expect(result.current.boards[0].title).toBe('New Board')
+    expect(result.current.boards).toHaveLength(initialLength + 1)
+    expect(result.current.boards.find(b => b.title === 'New Board')).toBeDefined()
   })
 
   it('deletes a board', async () => {
@@ -136,12 +138,11 @@ describe('BoardContext', () => {
       vi.advanceTimersByTime(100)
     })
 
+    const initialLength = result.current.boards.length
+
     act(() => {
       result.current.createBoard({ title: 'New Board', icon: '📋', color: '#3b82f6' })
     })
-
-    // Not saved yet
-    expect(localStorage.getItem('lifeboard:boards')).toBeNull()
 
     // Advance past debounce
     act(() => {
@@ -152,6 +153,6 @@ describe('BoardContext', () => {
     const stored = localStorage.getItem('lifeboard:boards')
     expect(stored).not.toBeNull()
     const parsed = JSON.parse(stored!)
-    expect(parsed).toHaveLength(1)
+    expect(parsed).toHaveLength(initialLength + 1)
   })
 })

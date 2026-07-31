@@ -2,6 +2,7 @@ import { createContext, useContext, useReducer, useEffect, useCallback, type Rea
 import { storage } from '@/shared/storage/StorageService'
 import { boardsSchema } from '@/shared/validations/board.schema'
 import { debounce } from '@/lib/utils'
+import { DEMO_BOARDS } from '../data/demo-boards'
 import type { Board, Card } from '../types'
 
 const STORAGE_KEY = 'boards'
@@ -98,14 +99,15 @@ export function BoardProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const raw = storage.get<unknown>(STORAGE_KEY)
     if (raw === null) {
-      dispatch({ type: 'LOAD_BOARDS', payload: [] })
+      // First visit: load demo data
+      dispatch({ type: 'LOAD_BOARDS', payload: DEMO_BOARDS })
       return
     }
 
     const result = boardsSchema.safeParse(raw)
     if (!result.success) {
       console.warn('[BoardProvider] Invalid data in storage, resetting')
-      dispatch({ type: 'LOAD_BOARDS', payload: [] })
+      dispatch({ type: 'LOAD_BOARDS', payload: DEMO_BOARDS })
       return
     }
 
