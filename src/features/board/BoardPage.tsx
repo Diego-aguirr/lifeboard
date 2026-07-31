@@ -1,25 +1,21 @@
 import { useParams, Link } from 'react-router'
-import { storage } from '@/shared/storage/StorageService'
-import { boardsSchema } from '@/shared/validations/board.schema'
+import { useBoardContext } from './context/BoardContext'
 import { useBoard } from './hooks/useBoard'
 import { BoardHeader } from './components/BoardHeader'
 import { ColumnList } from './components/ColumnList'
-import type { Board } from './types'
-
-function loadBoardFromStorage(boardId: string): Board | null {
-  const raw = storage.get<unknown>('boards')
-  if (raw === null) return null
-
-  const result = boardsSchema.safeParse(raw)
-  if (!result.success) return null
-
-  const boards = result.data as Board[]
-  return boards.find(b => b.id === boardId) ?? null
-}
 
 export default function BoardPage() {
   const { boardId } = useParams<{ boardId: string }>()
-  const boardFromStorage = boardId ? loadBoardFromStorage(boardId) : null
+  const { getBoardById, updateCard, loading } = useBoardContext()
+  const boardFromStorage = boardId ? getBoardById(boardId) : undefined
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">Cargando...</p>
+      </div>
+    )
+  }
 
   if (!boardFromStorage) {
     return (
@@ -62,6 +58,7 @@ export default function BoardPage() {
         onRenameCard={renameCard}
         onDeleteCard={deleteCard}
         onMoveCard={moveCard}
+        onUpdateCard={(cardId, updates) => updateCard(board.id, cardId, updates)}
       />
     </div>
   )

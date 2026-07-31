@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router'
-import { usePersistentBoards } from './hooks/usePersistentBoards'
+import { useBoardContext } from '@/features/board/context/BoardContext'
 import { BoardCard } from './components/BoardCard'
 import { CreateBoardForm } from './components/CreateBoardForm'
 
 export default function DashboardPage() {
-  const { boards, createBoard, deleteBoard } = usePersistentBoards()
+  const { boards, createBoard, deleteBoard, loading } = useBoardContext()
   const navigate = useNavigate()
 
   function handleCreate(title: string) {
@@ -15,6 +15,14 @@ export default function DashboardPage() {
     if (window.confirm('¿Eliminar este tablero?')) {
       deleteBoard(id)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">Cargando...</p>
+      </div>
+    )
   }
 
   return (
