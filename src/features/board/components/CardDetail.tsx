@@ -64,11 +64,17 @@ export function CardDetail({ card, isOpen, onClose, onSave }: CardDetailProps) {
   })
 
   function onSubmit(data: CardFormData) {
+    const completedCount = checklist.filter(i => i.completed).length
+    const calculatedProgress = checklist.length > 0
+      ? Math.round((completedCount / checklist.length) * 100)
+      : 0
+
     onSave({
       ...data,
       checklist,
       tags,
       notes,
+      progress: calculatedProgress,
       updatedAt: new Date().toISOString(),
     })
     onClose()
