@@ -10,7 +10,7 @@
 
 - **Stack**: React 19 + TypeScript + Vite 8 + Tailwind CSS v4
 - **Package manager**: pnpm
-- **Arquitectura**: Feature-based (`src/app/`, `src/features/`, `src/shared/`, `src/layouts/`)
+- **Arquitectura**: Feature-based — código organizado porFeatures, no por capas técnicas (`src/app/`, `src/features/`, `src/shared/`, `src/layouts/`)
 - **Persistencia**: LocalStorage (sin backend)
 - **Tests**: Vitest + Testing Library
 
