@@ -9,7 +9,7 @@ import { useKeyboardShortcuts } from '@/shared/hooks/useKeyboardShortcuts'
 
 export default function BoardPage() {
   const { boardId } = useParams<{ boardId: string }>()
-  const { getBoardById, loading } = useBoardContext()
+  const { getBoardById, updateBoard, loading } = useBoardContext()
   const boardFromStorage = boardId ? getBoardById(boardId) : undefined
   const [showCommandPalette, setShowCommandPalette] = useState(false)
 
@@ -53,7 +53,7 @@ export default function BoardPage() {
     deleteCard,
     moveCard,
     updateCard,
-  } = useBoard(boardFromStorage)
+  } = useBoard(boardFromStorage, { onUpdateBoard: updateBoard })
 
   return (
     <div className="flex flex-col h-full">
