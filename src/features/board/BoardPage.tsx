@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router'
 import { useBoardContext } from './context/BoardContext'
-import { useBoard } from './hooks/useBoard'
 import { BoardHeader } from './components/BoardHeader'
 import { ColumnList } from './components/ColumnList'
 import { CommandPalette } from '@/shared/components/CommandPalette/CommandPalette'
@@ -9,8 +8,20 @@ import { useKeyboardShortcuts } from '@/shared/hooks/useKeyboardShortcuts'
 
 export default function BoardPage() {
   const { boardId } = useParams<{ boardId: string }>()
-  const { getBoardById, loading } = useBoardContext()
-  const boardFromStorage = boardId ? getBoardById(boardId) : undefined
+  const {
+    getBoardById,
+    loading,
+    addColumn,
+    renameColumn,
+    deleteColumn,
+    moveColumn,
+    addCard,
+    renameCard,
+    deleteCard,
+    moveCard,
+    updateCard,
+  } = useBoardContext()
+  const board = boardId ? getBoardById(boardId) : undefined
   const [showCommandPalette, setShowCommandPalette] = useState(false)
 
   // Keyboard shortcuts
@@ -27,7 +38,7 @@ export default function BoardPage() {
     )
   }
 
-  if (!boardFromStorage) {
+  if (!board) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
         <p className="text-muted-foreground">Tablero no encontrado</p>
@@ -41,19 +52,7 @@ export default function BoardPage() {
     )
   }
 
-  const {
-    board,
-    columns,
-    addColumn,
-    renameColumn,
-    deleteColumn,
-    moveColumn,
-    addCard,
-    renameCard,
-    deleteCard,
-    moveCard,
-    updateCard,
-  } = useBoard(boardFromStorage)
+  const columns = [...board.columns].sort((a, b) => a.order - b.order)
 
   return (
     <div className="flex flex-col h-full">
@@ -62,14 +61,14 @@ export default function BoardPage() {
       <ColumnList
         boardId={board.id}
         columns={columns}
-        onAddColumn={addColumn}
-        onRenameColumn={renameColumn}
-        onDeleteColumn={deleteColumn}
-        onMoveColumn={moveColumn}
-        onAddCard={addCard}
-        onRenameCard={renameCard}
-        onDeleteCard={deleteCard}
-        onMoveCard={moveCard}
+        onAddColumn={title => addColumn(board.id, title)}
+        onRenameColumn={(columnId, title) => renameColumn(board.id, columnId, title)}
+        onDeleteColumn={columnId => deleteColumn(board.id, columnId)}
+        onMoveColumn={(columnId, direction) => moveColumn(board.id, columnId, direction)}
+        onAddCard={(columnId, title) => addCard(board.id, columnId, title)}
+        onRenameCard={(columnId, cardId, title) => renameCard(board.id, columnId, cardId, title)}
+        onDeleteCard={(columnId, cardId) => deleteCard(board.id, columnId, cardId)}
+        onMoveCard={(cardId, direction) => moveCard(board.id, cardId, direction)}
         onUpdateCard={(cardId, updates) => updateCard(board.id, cardId, updates)}
       />
 

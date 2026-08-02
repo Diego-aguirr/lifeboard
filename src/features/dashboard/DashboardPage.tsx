@@ -19,8 +19,8 @@ export default function DashboardPage() {
     )
   }, [boards, search])
 
-  function handleCreate(title: string) {
-    createBoard({ title, icon: '📋', color: '#3b82f6' })
+  function handleCreate(title: string, icon: string) {
+    createBoard({ title, icon, color: '#3b82f6' })
   }
 
   function handleDeleteClick(id: string, title: string) {

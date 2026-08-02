@@ -12,14 +12,17 @@ interface PomodoroState {
 const WORK_DURATION = 25 * 60 // 25 minutes
 const BREAK_DURATION = 5 * 60 // 5 minutes
 
-// Generate a pleasant notification sound using Web Audio API
-function playNotificationSound() {
+// Generate notification sound using Web Audio API
+function playNotificationSound(mode: 'work' | 'break') {
   try {
     const ctx = new AudioContext()
-
-    // Three ascending tones
-    const frequencies = [523.25, 659.25, 783.99] // C5, E5, G5
     const now = ctx.currentTime
+
+    // Work complete: ascending tones (C5 → E5 → G5) — achievement feeling
+    // Break complete: descending tones (G5 → E5 → C5) — back to work feeling
+    const frequencies = mode === 'work'
+      ? [523.25, 659.25, 783.99]  // C5, E5, G5 (ascending)
+      : [783.99, 659.25, 523.25]  // G5, E5, C5 (descending)
 
     frequencies.forEach((freq, i) => {
       const osc = ctx.createOscillator()
@@ -90,7 +93,7 @@ export function usePomodoro() {
         if (prev.timeLeft <= 1) {
           // Timer finished — play sound
           clearTimer()
-          playNotificationSound()
+          playNotificationSound(prev.mode)
           const newMode = prev.mode === 'work' ? 'break' : 'work'
           return {
             ...prev,

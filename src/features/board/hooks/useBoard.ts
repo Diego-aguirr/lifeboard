@@ -2,8 +2,22 @@ import { useState } from 'react'
 import { generateId } from '@/shared/utils/generateId'
 import type { Board, Column, Card } from '../types'
 
-export function useBoard(initialBoard: Board) {
+interface UseBoardOptions {
+  onUpdateBoard?: (id: string, updates: Partial<Board>) => void
+}
+
+export function useBoard(initialBoard: Board, options?: UseBoardOptions) {
   const [board, setBoard] = useState<Board>(initialBoard)
+
+  // Sync with context when board changes
+  function updateBoard(updates: Partial<Board>) {
+    setBoard(prev => {
+      const newBoard = { ...prev, ...updates, updatedAt: new Date().toISOString() }
+      // Persist to context
+      options?.onUpdateBoard?.(prev.id, newBoard)
+      return newBoard
+    })
+  }
 
   // ─── Column CRUD ────────────────────────────────────
 
@@ -15,27 +29,21 @@ export function useBoard(initialBoard: Board) {
       order: maxOrder + 1,
       cards: [],
     }
-    setBoard(prev => ({
-      ...prev,
-      columns: [...prev.columns, newColumn],
-      updatedAt: new Date().toISOString(),
-    }))
+    updateBoard({
+      columns: [...board.columns, newColumn],
+    })
   }
 
   function renameColumn(id: string, title: string) {
-    setBoard(prev => ({
-      ...prev,
-      columns: prev.columns.map(col => (col.id === id ? { ...col, title } : col)),
-      updatedAt: new Date().toISOString(),
-    }))
+    updateBoard({
+      columns: board.columns.map(col => (col.id === id ? { ...col, title } : col)),
+    })
   }
 
   function deleteColumn(id: string) {
-    setBoard(prev => ({
-      ...prev,
-      columns: prev.columns.filter(col => col.id !== id),
-      updatedAt: new Date().toISOString(),
-    }))
+    updateBoard({
+      columns: board.columns.filter(col => col.id !== id),
+    })
   }
 
   function moveColumn(id: string, direction: 'left' | 'right') {
@@ -48,15 +56,13 @@ export function useBoard(initialBoard: Board) {
     const sourceOrder = sorted[index].order
     const targetOrder = sorted[targetIndex].order
 
-    setBoard(prev => ({
-      ...prev,
-      columns: prev.columns.map(col => {
+    updateBoard({
+      columns: board.columns.map(col => {
         if (col.id === sorted[index].id) return { ...col, order: targetOrder }
         if (col.id === sorted[targetIndex].id) return { ...col, order: sourceOrder }
         return col
       }),
-      updatedAt: new Date().toISOString(),
-    }))
+    })
   }
 
   // ─── Card CRUD ──────────────────────────────────────
@@ -80,20 +86,17 @@ export function useBoard(initialBoard: Board) {
       createdAt: now,
       updatedAt: now,
     }
-    setBoard(prev => ({
-      ...prev,
-      columns: prev.columns.map(col =>
+    updateBoard({
+      columns: board.columns.map(col =>
         col.id === columnId ? { ...col, cards: [...col.cards, newCard] } : col
       ),
-      updatedAt: now,
-    }))
+    })
   }
 
   function renameCard(columnId: string, cardId: string, title: string) {
     const now = new Date().toISOString()
-    setBoard(prev => ({
-      ...prev,
-      columns: prev.columns.map(col =>
+    updateBoard({
+      columns: board.columns.map(col =>
         col.id === columnId
           ? {
               ...col,
@@ -103,20 +106,17 @@ export function useBoard(initialBoard: Board) {
             }
           : col
       ),
-      updatedAt: now,
-    }))
+    })
   }
 
   function deleteCard(columnId: string, cardId: string) {
-    setBoard(prev => ({
-      ...prev,
-      columns: prev.columns.map(col =>
+    updateBoard({
+      columns: board.columns.map(col =>
         col.id === columnId
           ? { ...col, cards: col.cards.filter(card => card.id !== cardId) }
           : col
       ),
-      updatedAt: new Date().toISOString(),
-    }))
+    })
   }
 
   function moveCard(cardId: string, direction: 'left' | 'right') {
@@ -135,9 +135,8 @@ export function useBoard(initialBoard: Board) {
     if (!card) return
 
     const now = new Date().toISOString()
-    setBoard(prev => ({
-      ...prev,
-      columns: prev.columns.map(col => {
+    updateBoard({
+      columns: board.columns.map(col => {
         if (col.id === sourceCol.id) {
           return { ...col, cards: col.cards.filter(c => c.id !== cardId) }
         }
@@ -146,22 +145,19 @@ export function useBoard(initialBoard: Board) {
         }
         return col
       }),
-      updatedAt: now,
-    }))
+    })
   }
 
   function updateCard(cardId: string, updates: Partial<Card>) {
     const now = new Date().toISOString()
-    setBoard(prev => ({
-      ...prev,
-      columns: prev.columns.map(col => ({
+    updateBoard({
+      columns: board.columns.map(col => ({
         ...col,
         cards: col.cards.map(card =>
           card.id === cardId ? { ...card, ...updates, updatedAt: now } : card
         ),
       })),
-      updatedAt: now,
-    }))
+    })
   }
 
   // ─── Derived state ──────────────────────────────────

@@ -18,7 +18,7 @@ describe('CreateBoardForm', () => {
     await user.type(screen.getByRole('textbox'), 'Mi tablero')
     await user.click(screen.getByRole('button', { name: /crear/i }))
 
-    expect(handleCreate).toHaveBeenCalledWith('Mi tablero')
+    expect(handleCreate).toHaveBeenCalledWith('Mi tablero', '📋')
   })
 
   it('clears input after successful submission', async () => {

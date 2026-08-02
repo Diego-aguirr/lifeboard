@@ -2,8 +2,9 @@ import { createContext, useContext, useReducer, useEffect, useCallback, type Rea
 import { storage } from '@/shared/storage/StorageService'
 import { boardsSchema } from '@/shared/validations/board.schema'
 import { debounce } from '@/lib/utils'
+import { generateId } from '@/shared/utils/generateId'
 import { DEMO_BOARDS } from '../data/demo-boards'
-import type { Board, Card } from '../types'
+import type { Board, Column, Card } from '../types'
 
 const STORAGE_KEY = 'boards'
 
@@ -27,6 +28,7 @@ type BoardAction =
   | { type: 'DELETE_BOARD'; payload: string }
   | { type: 'UPDATE_BOARD'; payload: { id: string; updates: Partial<Board> } }
   | { type: 'UPDATE_CARD'; payload: { boardId: string; cardId: string; updates: Partial<Card> } }
+  | { type: 'SET_BOARD'; payload: { id: string; board: Board } }
 
 // ─── Reducer ───────────────────────────────────────────
 
@@ -71,6 +73,14 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
         }),
       }
 
+    case 'SET_BOARD':
+      return {
+        ...state,
+        boards: state.boards.map(b =>
+          b.id === action.payload.id ? action.payload.board : b
+        ),
+      }
+
     default:
       return state
   }
@@ -86,6 +96,14 @@ interface BoardContextValue {
   updateBoard: (id: string, updates: Partial<Board>) => void
   updateCard: (boardId: string, cardId: string, updates: Partial<Card>) => void
   getBoardById: (id: string) => Board | undefined
+  addColumn: (boardId: string, title: string) => void
+  renameColumn: (boardId: string, columnId: string, title: string) => void
+  deleteColumn: (boardId: string, columnId: string) => void
+  moveColumn: (boardId: string, columnId: string, direction: 'left' | 'right') => void
+  addCard: (boardId: string, columnId: string, title: string) => void
+  renameCard: (boardId: string, columnId: string, cardId: string, title: string) => void
+  deleteCard: (boardId: string, columnId: string, cardId: string) => void
+  moveCard: (boardId: string, cardId: string, direction: 'left' | 'right') => void
 }
 
 const BoardContext = createContext<BoardContextValue | null>(null)
@@ -174,6 +192,223 @@ export function BoardProvider({ children }: { children: ReactNode }) {
     return state.boards.find(b => b.id === id)
   }
 
+  // ─── Column CRUD ────────────────────────────────────
+
+  function addColumn(boardId: string, title: string) {
+    const board = getBoardById(boardId)
+    if (!board) return
+
+    const maxOrder = board.columns.reduce((max, col) => Math.max(max, col.order), -1)
+    const newColumn: Column = {
+      id: generateId(),
+      title,
+      order: maxOrder + 1,
+      cards: [],
+    }
+
+    dispatch({
+      type: 'SET_BOARD',
+      payload: {
+        id: boardId,
+        board: {
+          ...board,
+          columns: [...board.columns, newColumn],
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    })
+  }
+
+  function renameColumn(boardId: string, columnId: string, title: string) {
+    const board = getBoardById(boardId)
+    if (!board) return
+
+    dispatch({
+      type: 'SET_BOARD',
+      payload: {
+        id: boardId,
+        board: {
+          ...board,
+          columns: board.columns.map(col => (col.id === columnId ? { ...col, title } : col)),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    })
+  }
+
+  function deleteColumn(boardId: string, columnId: string) {
+    const board = getBoardById(boardId)
+    if (!board) return
+
+    dispatch({
+      type: 'SET_BOARD',
+      payload: {
+        id: boardId,
+        board: {
+          ...board,
+          columns: board.columns.filter(col => col.id !== columnId),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    })
+  }
+
+  function moveColumn(boardId: string, columnId: string, direction: 'left' | 'right') {
+    const board = getBoardById(boardId)
+    if (!board) return
+
+    const sorted = [...board.columns].sort((a, b) => a.order - b.order)
+    const index = sorted.findIndex(col => col.id === columnId)
+    const targetIndex = direction === 'right' ? index + 1 : index - 1
+
+    if (targetIndex < 0 || targetIndex >= sorted.length) return
+
+    const sourceOrder = sorted[index].order
+    const targetOrder = sorted[targetIndex].order
+
+    dispatch({
+      type: 'SET_BOARD',
+      payload: {
+        id: boardId,
+        board: {
+          ...board,
+          columns: board.columns.map(col => {
+            if (col.id === sorted[index].id) return { ...col, order: targetOrder }
+            if (col.id === sorted[targetIndex].id) return { ...col, order: sourceOrder }
+            return col
+          }),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    })
+  }
+
+  // ─── Card CRUD ──────────────────────────────────────
+
+  function addCard(boardId: string, columnId: string, title: string) {
+    const board = getBoardById(boardId)
+    if (!board) return
+
+    const now = new Date().toISOString()
+    const newCard: Card = {
+      id: generateId(),
+      title,
+      description: '',
+      notes: '',
+      priority: 'low',
+      tags: [],
+      checklist: [],
+      progress: 0,
+      timeSpent: 0,
+      startDate: null,
+      targetDate: null,
+      difficulty: 'medium',
+      order: 0,
+      createdAt: now,
+      updatedAt: now,
+    }
+
+    dispatch({
+      type: 'SET_BOARD',
+      payload: {
+        id: boardId,
+        board: {
+          ...board,
+          columns: board.columns.map(col =>
+            col.id === columnId ? { ...col, cards: [...col.cards, newCard] } : col
+          ),
+          updatedAt: now,
+        },
+      },
+    })
+  }
+
+  function renameCard(boardId: string, columnId: string, cardId: string, title: string) {
+    const board = getBoardById(boardId)
+    if (!board) return
+
+    const now = new Date().toISOString()
+    dispatch({
+      type: 'SET_BOARD',
+      payload: {
+        id: boardId,
+        board: {
+          ...board,
+          columns: board.columns.map(col =>
+            col.id === columnId
+              ? {
+                  ...col,
+                  cards: col.cards.map(card =>
+                    card.id === cardId ? { ...card, title, updatedAt: now } : card
+                  ),
+                }
+              : col
+          ),
+          updatedAt: now,
+        },
+      },
+    })
+  }
+
+  function deleteCard(boardId: string, columnId: string, cardId: string) {
+    const board = getBoardById(boardId)
+    if (!board) return
+
+    dispatch({
+      type: 'SET_BOARD',
+      payload: {
+        id: boardId,
+        board: {
+          ...board,
+          columns: board.columns.map(col =>
+            col.id === columnId
+              ? { ...col, cards: col.cards.filter(card => card.id !== cardId) }
+              : col
+          ),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    })
+  }
+
+  function moveCard(boardId: string, cardId: string, direction: 'left' | 'right') {
+    const board = getBoardById(boardId)
+    if (!board) return
+
+    const sorted = [...board.columns].sort((a, b) => a.order - b.order)
+    const sourceIndex = sorted.findIndex(col => col.cards.some(card => card.id === cardId))
+    if (sourceIndex === -1) return
+
+    const targetIndex = direction === 'right' ? sourceIndex + 1 : sourceIndex - 1
+    if (targetIndex < 0 || targetIndex >= sorted.length) return
+
+    const sourceCol = sorted[sourceIndex]
+    const targetCol = sorted[targetIndex]
+    const card = sourceCol.cards.find(c => c.id === cardId)
+    if (!card) return
+
+    const now = new Date().toISOString()
+    dispatch({
+      type: 'SET_BOARD',
+      payload: {
+        id: boardId,
+        board: {
+          ...board,
+          columns: board.columns.map(col => {
+            if (col.id === sourceCol.id) {
+              return { ...col, cards: col.cards.filter(c => c.id !== cardId) }
+            }
+            if (col.id === targetCol.id) {
+              return { ...col, cards: [...col.cards, { ...card, updatedAt: now }] }
+            }
+            return col
+          }),
+          updatedAt: now,
+        },
+      },
+    })
+  }
+
   const value: BoardContextValue = {
     boards: state.boards,
     loading: state.loading,
@@ -182,6 +417,14 @@ export function BoardProvider({ children }: { children: ReactNode }) {
     updateBoard,
     updateCard,
     getBoardById,
+    addColumn,
+    renameColumn,
+    deleteColumn,
+    moveColumn,
+    addCard,
+    renameCard,
+    deleteCard,
+    moveCard,
   }
 
   return <BoardContext.Provider value={value}>{children}</BoardContext.Provider>
