@@ -1,0 +1,29 @@
+{
+  "cSpell.words": [
+    "Enfocado",
+    "Imparable",
+    "Coleccionista",
+    "Organizador",
+    "Primer",
+    "Tablero",
+    "Tarjeta",
+    "Maestro",
+    "Desarrolladores",
+    "arquitectura",
+    "persistencia",
+    "trazables"
+  ],
+  "cSpell.language": "es",
+  "cSpell.enabledLanguageIds": [
+    "markdown",
+    "plaintext"
+  ],
+  "cSpell.ignorePaths": [
+    "**/*.tsx",
+    "**/*.ts",
+    "**/*.js",
+    "**/*.jsx"
+  ],
+  "prisma-smart-formatter.typescript.defaultFormatter": "esbenp.prettier-vscode",
+  "prisma-smart-formatter.typescriptreact.defaultFormatter": "esbenp.prettier-vscode"
+}
