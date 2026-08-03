@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router'
 import { useBoardContext } from '@/features/board/context/BoardContext'
 import { useAchievements } from '@/shared/hooks/useAchievements'
 import { AchievementNotification } from '@/shared/components/Achievement/AchievementNotification'
+import { ChatBot } from '@/features/ai'
 import { routes } from './routes'
 
 const router = createBrowserRouter(routes)
@@ -19,6 +20,7 @@ function AchievementChecker() {
     <>
       <RouterProvider router={router} />
       <AchievementNotification achievement={newAchievement} onDismiss={dismissNotification} />
+      <ChatBot router={router} />
     </>
   )
 }

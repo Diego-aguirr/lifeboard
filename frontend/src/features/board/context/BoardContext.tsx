@@ -91,7 +91,7 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
 interface BoardContextValue {
   boards: Board[]
   loading: boolean
-  createBoard: (input: { title: string; icon: string; color: string }) => void
+  createBoard: (input: { title: string; icon: string; color: string; columns?: Array<{ title: string; cards: Array<{ title: string; description: string; priority: 'low' | 'medium' | 'high' }> }> }) => void
   deleteBoard: (id: string) => void
   updateBoard: (id: string, updates: Partial<Board>) => void
   updateCard: (boardId: string, cardId: string, updates: Partial<Card>) => void
@@ -156,7 +156,7 @@ export function BoardProvider({ children }: { children: ReactNode }) {
 
   // ─── Actions ────────────────────────────────────────
 
-  function createBoard(input: { title: string; icon: string; color: string }) {
+  function createBoard(input: { title: string; icon: string; color: string; columns?: Array<{ title: string; cards: Array<{ title: string; description: string; priority: 'low' | 'medium' | 'high' }> }> }) {
     const now = new Date().toISOString()
     const newBoard: Board = {
       id: crypto.randomUUID(),
@@ -165,7 +165,28 @@ export function BoardProvider({ children }: { children: ReactNode }) {
       color: input.color,
       createdAt: now,
       updatedAt: now,
-      columns: [],
+      columns: input.columns?.map((col, i) => ({
+        id: crypto.randomUUID(),
+        title: col.title,
+        order: i,
+        cards: col.cards.map((card, j) => ({
+          id: crypto.randomUUID(),
+          title: card.title,
+          description: card.description,
+          notes: '',
+          priority: card.priority,
+          tags: [],
+          checklist: [],
+          progress: 0,
+          timeSpent: 0,
+          startDate: null,
+          targetDate: null,
+          difficulty: 'medium' as const,
+          order: j,
+          createdAt: now,
+          updatedAt: now,
+        })),
+      })) || [],
     }
     dispatch({ type: 'CREATE_BOARD', payload: newBoard })
   }
