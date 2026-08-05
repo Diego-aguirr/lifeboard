@@ -186,7 +186,6 @@ pnpm install:all
 # Tests
 pnpm --filter lifeboard-frontend test
 pnpm --filter lifeboard-frontend test:run
-pnpm --filter lifeboard-backend test
 
 # Type check
 pnpm --filter lifeboard-frontend typecheck
@@ -303,7 +302,6 @@ pnpm --filter lifeboard-frontend typecheck
 
 # Verificar que tests pasan
 pnpm --filter lifeboard-frontend test:run
-pnpm --filter lifeboard-backend test
 
 # Resetear base de datos
 rm -f backend/lifeboard.db backend/lifeboard.db-wal backend/lifeboard.db-shm
