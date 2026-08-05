@@ -225,7 +225,6 @@ pnpm --filter lifeboard-frontend build
 # Tests
 pnpm --filter lifeboard-frontend test       # Watch mode
 pnpm --filter lifeboard-frontend test:run   # Una vez
-pnpm --filter lifeboard-backend test
 
 # Type check
 pnpm --filter lifeboard-frontend typecheck
@@ -272,9 +271,6 @@ pnpm --filter lifeboard-frontend typecheck
 # Frontend
 pnpm --filter lifeboard-frontend test
 pnpm --filter lifeboard-frontend test:coverage
-
-# Backend
-pnpm --filter lifeboard-backend test
 ```
 
 ### Cobertura de Tests
